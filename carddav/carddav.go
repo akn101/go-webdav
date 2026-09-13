@@ -31,6 +31,16 @@ type AddressBook struct {
 	// ReadOnly reports that the current user may only read this address book.
 	// It controls the DAV:current-user-privilege-set reported by the server.
 	ReadOnly bool
+
+	// CTag is an opaque token that must change whenever the contents of the
+	// address book change. When non-empty it is served as CS:getctag.
+	//
+	// Clients poll a collection with a cheap Depth: 0 PROPFIND and skip the far
+	// more expensive Depth: 1 enumeration while the token they already hold
+	// still matches. A backend that leaves this empty advertises no change
+	// token at all, so those clients re-read every address object on every
+	// poll.
+	CTag string
 }
 
 func (ab *AddressBook) SupportsAddressData(contentType, version string) bool {
